@@ -1,3 +1,6 @@
+// parts of this class are due to
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms737591(v=vs.85).aspx
+
 #include "client.h"
 #include <string>
 
@@ -7,7 +10,7 @@ Client::Client(char* hostname) {
 
 int Client::init() {
 	WSADATA wsaData;
-	this->ConnectSocket = INVALID_SOCKET;
+	this->connectSocket = INVALID_SOCKET;
 	struct addrinfo *result = NULL,
 		*ptr = NULL,
 		hints;
@@ -37,19 +40,19 @@ int Client::init() {
 	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		this->ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+		this->connectSocket = socket(ptr->ai_family, ptr->ai_socktype,
 			ptr->ai_protocol);
-		if (this->ConnectSocket == INVALID_SOCKET) {
+		if (this->connectSocket == INVALID_SOCKET) {
 			printf("socket failed with error: %ld\n", WSAGetLastError());
 			WSACleanup();
 			return 1;
 		}
 
 		// Connect to server.
-		iResult = connect(this->ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		iResult = connect(this->connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 		if (iResult == SOCKET_ERROR) {
-			closesocket(this->ConnectSocket);
-			this->ConnectSocket = INVALID_SOCKET;
+			closesocket(this->connectSocket);
+			this->connectSocket = INVALID_SOCKET;
 			continue;
 		}
 		break;
@@ -57,7 +60,7 @@ int Client::init() {
 
 	freeaddrinfo(result);
 
-	if (this->ConnectSocket == INVALID_SOCKET) {
+	if (this->connectSocket == INVALID_SOCKET) {
 		printf("Unable to connect to server!\n");
 		WSACleanup();
 		return 1;
@@ -66,7 +69,7 @@ int Client::init() {
 	return 0;
 }
 
-void Client::start_comm() {
+void Client::startComm() {
 	char sendbuf[DEFAULT_BUFLEN];
 	int iResult;
 	do {
@@ -74,10 +77,10 @@ void Client::start_comm() {
 		if (strcmp(sendbuf, TERMINATE) == 0) {
 			break;
 		}
-		iResult = send(this->ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+		iResult = send(this->connectSocket, sendbuf, (int)strlen(sendbuf), 0);
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed with error: %d\n", WSAGetLastError());
-			closesocket(this->ConnectSocket);
+			closesocket(this->connectSocket);
 			WSACleanup();
 			return;
 		}
@@ -87,16 +90,16 @@ void Client::start_comm() {
 Client::~Client() {
 	int iResult;
 	// shutdown the connection since no more data will be sent
-	iResult = shutdown(ConnectSocket, SD_SEND);
+	iResult = shutdown(connectSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
 		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(ConnectSocket);
+		closesocket(connectSocket);
 		WSACleanup();
 		return;
 	}
 
 	// cleanup
-	closesocket(ConnectSocket);
+	closesocket(connectSocket);
 	WSACleanup();
 }
 
@@ -110,9 +113,7 @@ int main(int argc, char **argv)
 
 	Client client(argv[1]);
 	if (client.init() == 0) {
-		client.start_comm();
+		client.startComm();
 	}
-	// remove!
-	system("pause");
 	return 0;
 }

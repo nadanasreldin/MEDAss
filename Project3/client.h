@@ -1,3 +1,6 @@
+// parts of this class are due to
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms737591(v=vs.85).aspx
+
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
@@ -18,10 +21,10 @@
 class Client {
 private:
 	char* hostname;
-	SOCKET ConnectSocket;
+	SOCKET connectSocket;
 public:
 	Client(char*);
 	~Client();
 	int init();
-	void start_comm();
+	void startComm();
 };

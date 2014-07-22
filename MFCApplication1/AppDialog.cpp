@@ -37,29 +37,10 @@ BEGIN_MESSAGE_MAP(CAppDialog, CDialogEx)
 	ON_BN_CLICKED(IDC_STATUSBAR, &CAppDialog::OnBnClickedStatusbar)
 	ON_BN_CLICKED(IDC_GUILOG, &CAppDialog::OnBnClickedGuilog)
 	ON_BN_CLICKED(IDC_LOGFILE, &CAppDialog::OnBnClickedLogfile)
+	ON_MESSAGE(WM_NEW_MSG, &CAppDialog::OnNewMessage)
 	ON_MESSAGE(WM_UPDATE_STATUSBAR, &CAppDialog::OnUpdateStatusBar)
 	ON_MESSAGE(WM_UPDATE_GUILOG, &CAppDialog::OnUpdateGuiLog)
-	ON_MESSAGE(WM_NEW_MSG, &CAppDialog::OnNewMessage)
 END_MESSAGE_MAP()
-
-//DWORD WINAPI CAppDialog::uiThrdStatic(void *pThis) {
-//	CAppDialog * pDlg = (CAppDialog*)pThis;
-//	return pDlg->uiThrd();
-//}
-//
-//DWORD CAppDialog::uiThrd() {
-//	/*MSG msg;
-//	bool msgReturn = GetMessage(&msg, NULL, WM_USER + 1, WM_USER + 2);
-//
-//	if (msgReturn) {
-//	statusBar.update();
-//	guiLog.update();
-//	logFile.update();
-//	}*/
-//	statusBarOutput->update(_T("BLABALBALBA"));
-//	guiLogOutput->update(_T("BLABALBALBA"));
-//	return 0;
-//}
 
 DWORD WINAPI CAppDialog::serverThrd(LPVOID pParam) {
 	HWND* handle = (HWND*)pParam;
@@ -70,31 +51,18 @@ DWORD WINAPI CAppDialog::serverThrd(LPVOID pParam) {
 	return 0;
 }
 
-
 // CMFCApplication1Dlg message handlers
 
 BOOL CAppDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	//setlocale(LC_CTYPE, "");
-
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	// get window object handle
-	HWND *handle = new HWND;
-	*handle = GetSafeHwnd();
-
-	// initialize the 3 output destinations
-
-	// init guiLogOutput
-	//guiLogOutput = new GuiLogOutput((CStatic*)GetDlgItem(IDC_LOG));
-	guiLogOutput = new GuiLogOutput(handle);
-
-	// create status bar and init statusBarOutput
+	// create status bar
 	statusBar.Create(this);
 	statusBar.SetIndicators(indicators, 1);
 	CRect rect;
@@ -102,22 +70,16 @@ BOOL CAppDialog::OnInitDialog()
 	statusBar.SetPaneInfo(0, ID_INDICATOR, SBPS_NORMAL, rect.Width());
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, ID_INDICATOR);
 
-	statusBarOutput = new StatusBarOutput(handle); 
+	// get window object handle
+	HWND *handle = new HWND;
+	*handle = GetSafeHwnd();
 
+	// initialize the 3 output destinations
+	statusBarOutput = new StatusBarOutput(handle);
+	guiLogOutput = new GuiLogOutput(handle);
 	logFileOutput = new LogFileOutput("output.log");
 
-	//HANDLE uiHandle, serverHandle;.
-	//DWORD uiThrdId, serverThrdId;
-
-	//// initialize thread that listens on msg queue (how??) and invokes
-	//// the update function of the three destinations outputs accordingly
-	////uiHandle = CreateThread(NULL, 0, uiThrdStatic, (void*) this, 0, &uiThrdId);
-
-
-	//// initialize server in new thread
-	//// pass newly created msg queue to constructor
-	//serverHandle = CreateThread(NULL, 0, serverThrd, 0, 0, &serverThrdId);
-
+	// start server logic in another thread
 	DWORD serverThrdId;
 	HANDLE serverHandle = CreateThread(NULL, 0, serverThrd, handle, 0, &serverThrdId);
 
@@ -191,12 +153,22 @@ void CAppDialog::OnBnClickedGuilog()
 
 void CAppDialog::OnBnClickedLogfile()
 {
-	if (((CButton *)GetDlgItem(IDC_LOGFILE))->GetCheck() == BST_CHECKED) {
+	if (((CButton *)GetDlgItem(IDC_LOGFILE))->GetCheck()) {
 		logFileOutput->enable();
 	}
 	else {
 		logFileOutput->disable();
 	}
+}
+
+LRESULT CAppDialog::OnNewMessage(WPARAM wParam, LPARAM lParam) {
+	LPTSTR msg = (LPTSTR)lParam;
+
+	statusBarOutput->update(msg);
+	guiLogOutput->update(msg);
+	logFileOutput->update(msg);
+
+	return 0;
 }
 
 LRESULT CAppDialog::OnUpdateStatusBar(WPARAM wParam, LPARAM lParam) {
@@ -216,25 +188,6 @@ LRESULT CAppDialog::OnUpdateGuiLog(WPARAM wParam, LPARAM lParam) {
 	guiLog->SetSel(textLen, textLen);
 	guiLog->ReplaceSel(line);
 	guiLog->LineScroll(guiLog->GetLineCount());
-		
-	/*CString previousText;
-	guiLog->GetWindowText(previousText);
-	guiLog->SetWindowText(previousText + "\r" + msg);*/
-
-	
-	//guiLog->SetWindowText(msg);
-
-	return 0;
-}
-
-LRESULT CAppDialog::OnNewMessage(WPARAM wParam, LPARAM lParam) {
-	/*statusBarOutput->update(_T("BLABALBALBA"));
-	guiLogOutput->update(_T("BLABALBALBA"));*/
-
-	//statusBarOutput->update((LPTSTR)wParam);
-	statusBarOutput->update((LPTSTR)lParam);
-	guiLogOutput->update((LPTSTR)lParam);
-	logFileOutput->update((LPTSTR)lParam);
 
 	return 0;
 }
@@ -243,25 +196,8 @@ CAppDialog::StatusBarOutput::StatusBarOutput(HWND* handle) {
 	this->handle = handle;
 }
 
-void CAppDialog::StatusBarOutput::update(LPTSTR newString) {
-	if (isEnabled()) {
-		::SendMessage(*this->handle, WM_UPDATE_STATUSBAR, 0, (LPARAM)newString);
-	}
-}
-
-//CAppDialog::GuiLogOutput::GuiLogOutput(CStatic* guiLog) {
-//	this->guiLog = guiLog;
-//}
-
 CAppDialog::GuiLogOutput::GuiLogOutput(HWND* handle) {
 	this->handle = handle;
-}
-
-void CAppDialog::GuiLogOutput::update(LPTSTR newString) {
-	if (isEnabled()) {
-		//guiLog->SetWindowText(newString);
-		::SendMessage(*this->handle, WM_UPDATE_GUILOG, 0, (LPARAM)newString);
-	}
 }
 
 CAppDialog::LogFileOutput::LogFileOutput(char* filename) {
@@ -272,17 +208,33 @@ CAppDialog::LogFileOutput::~LogFileOutput() {
 	this->file.close();
 }
 
-void CAppDialog::LogFileOutput::update(LPTSTR newString) {
+void CAppDialog::StatusBarOutput::update(LPTSTR newString) {
 	if (isEnabled()) {
+		::SendMessage(*this->handle, WM_UPDATE_STATUSBAR, 0, (LPARAM)newString);
+	}
+}
+
+void CAppDialog::GuiLogOutput::update(LPTSTR newString) {
+	if (isEnabled()) {
+		::SendMessage(*this->handle, WM_UPDATE_GUILOG, 0, (LPARAM)newString);
+	}
+}
+
+void CAppDialog::LogFileOutput::update(LPTSTR newMsg) {
+	if (isEnabled()) {
+		// get current time
 		__time32_t clock;
 		struct tm time;
-		char buffer[32];
+		char timebuf[32];
 
 		_time32(&clock);
 		_localtime32_s(&time, &clock);
-		asctime_s(buffer, 32, &time);
+		asctime_s(timebuf, 32, &time);
 
-		file << buffer << newString;
+		timebuf[strlen(timebuf) - 1] = '\0';
+
+		// add to log file time + message
+		file << timebuf << '\t' << newMsg;
 		file.flush();
 	}
 }

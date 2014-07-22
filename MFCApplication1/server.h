@@ -1,3 +1,6 @@
+// parts of this class are due to
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms737593(v=vs.85).aspx
+
 #undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN

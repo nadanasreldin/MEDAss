@@ -20,7 +20,6 @@ private:
 		void disable() { enabled = false; }
 		virtual void update(LPTSTR newString) = 0;
 	};
-
 	class StatusBarOutput : public ServerOutput {
 	private:
 		HWND* handle;
@@ -67,23 +66,21 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
+	static DWORD WINAPI serverThrd(void *);
+
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedStatusbar();
 	afx_msg void OnBnClickedGuilog();
 	afx_msg void OnBnClickedLogfile();
+
+	LRESULT CAppDialog::OnNewMessage(WPARAM, LPARAM);
 	LRESULT CAppDialog::OnUpdateStatusBar(WPARAM, LPARAM);
 	LRESULT CAppDialog::OnUpdateGuiLog(WPARAM, LPARAM);
-	LRESULT CAppDialog::OnNewMessage(WPARAM, LPARAM);
-public:
-	//static DWORD WINAPI uiThrdStatic(void *);
-	//DWORD uiThrd();
-	static DWORD WINAPI serverThrd(void *);
+
 private:
 	StatusBarOutput* statusBarOutput;
 	GuiLogOutput* guiLogOutput;
 	LogFileOutput* logFileOutput;
-private:
+
 	CStatusBar statusBar;
-public:
-	afx_msg void OnStnClickedLog();
 };

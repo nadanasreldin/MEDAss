@@ -1,3 +1,6 @@
+// parts of this class are due to
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms737593(v=vs.85).aspx
+
 #include "stdafx.h"
 #include "server.h"
 
@@ -107,7 +110,6 @@ void Server::start_comm() {
 		ZeroMemory(recvbuf, recvbuflen);
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
-			//printf("Bytes received: %d\n", iResult);
 			printf("%s", recvbuf);
 
 			/*wchar_t tempbuf[DEFAULT_BUFLEN];
@@ -129,7 +131,7 @@ void Server::start_comm() {
 			// PostMessage(*this->handle, WM_NEW_MSG, (WPARAM)msg, 0);
 			PostMessage(*this->handle, WM_NEW_MSG, 0, (LPARAM)tempbuf);
 
-			// free tempbuf??? where? not here
+			// TODO: free tempbuf??? where? not here
 		}
 		else if (iResult == 0)
 			printf("Connection closing...\n");
@@ -142,16 +144,4 @@ void Server::start_comm() {
 
 	} while (iResult > 0);
 }
-
-//int main(void)
-//{
-//	Server server(DEFAULT_PORT);
-//	if (server.init() == 0) {
-//		server.start_comm();
-//	}
-//
-//	// remove!
-//	system("pause");
-//	return 0;
-//}
 
