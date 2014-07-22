@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="client.cpp" />
+    <ClInclude Include="client.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h" />
+    <ClCompile Include="client.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{94E1B5C4-19D1-4452-A204-FD19DBE222E0}</ProjectGuid>
