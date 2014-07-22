@@ -1,0 +1,17 @@
+﻿Build started 2014/07/22 05:29:11 PM.
+     1>Project "C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\ServerApp\ServerApp.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\ServerApp.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ServerAppDlg.cpp
+         ServerAppDlg.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.lib" /MACHINE:X86 Debug\ServerApp.res
+         Debug\Server.obj
+         Debug\ServerApp.obj
+         Debug\ServerAppDlg.obj
+         Debug\stdafx.obj
+         ServerApp.vcxproj -> C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.exe
+     1>Done Building Project "C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\ServerApp\ServerApp.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:09.51
