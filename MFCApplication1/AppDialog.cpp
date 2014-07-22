@@ -104,6 +104,8 @@ BOOL CAppDialog::OnInitDialog()
 
 	statusBarOutput = new StatusBarOutput(handle); 
 
+	logFileOutput = new LogFileOutput("output.log");
+
 	//HANDLE uiHandle, serverHandle;.
 	//DWORD uiThrdId, serverThrdId;
 
@@ -232,6 +234,7 @@ LRESULT CAppDialog::OnNewMessage(WPARAM wParam, LPARAM lParam) {
 	//statusBarOutput->update((LPTSTR)wParam);
 	statusBarOutput->update((LPTSTR)lParam);
 	guiLogOutput->update((LPTSTR)lParam);
+	logFileOutput->update((LPTSTR)lParam);
 
 	return 0;
 }
@@ -261,6 +264,25 @@ void CAppDialog::GuiLogOutput::update(LPTSTR newString) {
 	}
 }
 
-void CAppDialog::LogFileOutput::update(LPTSTR newString) {
+CAppDialog::LogFileOutput::LogFileOutput(char* filename) {
+	this->file.open(filename);
+}
 
+CAppDialog::LogFileOutput::~LogFileOutput() {
+	this->file.close();
+}
+
+void CAppDialog::LogFileOutput::update(LPTSTR newString) {
+	if (isEnabled()) {
+		__time32_t clock;
+		struct tm time;
+		char buffer[32];
+
+		_time32(&clock);
+		_localtime32_s(&time, &clock);
+		asctime_s(buffer, 32, &time);
+
+		file << buffer << newString;
+		file.flush();
+	}
 }

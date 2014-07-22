@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <fstream>
+
 // CAppDialog dialog
 class CAppDialog : public CDialogEx
 {
@@ -36,7 +38,11 @@ private:
 	};
 
 	class LogFileOutput : public ServerOutput {
+	private:
+		std::wofstream file;
 	public:
+		LogFileOutput(char* filename);
+		~LogFileOutput();
 		void update(LPTSTR newString);
 	};
 
