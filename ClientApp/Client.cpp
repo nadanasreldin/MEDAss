@@ -7,14 +7,6 @@ Client::~Client() {
 	int iResult;
 	// shutdown the connection since no more data will be sent
 	iResult = shutdown(connectSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(connectSocket);
-		WSACleanup();
-		return;
-	}
-
-	// cleanup
 	closesocket(connectSocket);
 	WSACleanup();
 }

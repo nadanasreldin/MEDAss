@@ -1,13 +1,15 @@
-﻿Build started 2014/07/23 04:09:11 AM.
+﻿Build started 2014/07/23 05:02:29 AM.
      1>Project "C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\ServerApp\ServerApp.vcxproj" on node 3 (Build target(s)).
      1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Debug\ServerApp.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\ServerApp.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Server.cpp ServerApp.cpp ServerAppDlg.cpp
          ServerAppDlg.cpp
+         ServerApp.cpp
          Server.cpp
          Generating Code...
-         Compiling...
-         ServerApp.cpp
-         Generating Code...
+       ResourceCompile:
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\rc.exe /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /l"0x0409" /IDebug\ /nologo /fo"Debug\ServerApp.res" ServerApp.rc 
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\nevine\Documents\Visual Studio 2013\Projects\Project3\Debug\ServerApp.lib" /MACHINE:X86 Debug\ServerApp.res
          Debug\Server.obj
@@ -19,4 +21,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:29.27
+Time Elapsed 00:00:12.73
