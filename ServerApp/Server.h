@@ -22,11 +22,13 @@
 class Server {
 private:
 	PCSTR port;
-	SOCKET ClientSocket;
-	HWND* handle;
+	SOCKET clientSocket;
+	HWND* windowHandle;
+	HANDLE* shutdownEvent;
 public:
-	Server(char*, HWND*);
+	Server::Server(char* port, HWND* windowHandle, HANDLE* shutdownEvent)
+		: port(port), windowHandle(windowHandle), shutdownEvent(shutdownEvent) {}
 	~Server();
 	int init();
-	void start_comm();
+	void startComm();
 };

@@ -18,22 +18,24 @@ private:
 		bool isEnabled() { return enabled; }
 		void enable() { enabled = true; }
 		void disable() { enabled = false; }
-		virtual void update(LPTSTR newString) = 0;
+		virtual void update(LPTSTR) = 0;
 	};
 	class StatusBarOutput : public ServerOutput {
 	private:
 		HWND* handle;
 	public:
-		StatusBarOutput(HWND*);
-		void update(LPTSTR newString);
+		StatusBarOutput(HWND* handle)
+			:handle(handle){};
+		void update(LPTSTR);
 	};
 
 	class GuiLogOutput : public ServerOutput {
 	private:
 		HWND* handle;
 	public:
-		GuiLogOutput(HWND*);
-		void update(LPTSTR newString);
+		GuiLogOutput(HWND* handle)
+			:handle(handle){};
+		void update(LPTSTR);
 	};
 
 	class LogFileOutput : public ServerOutput {
@@ -42,7 +44,7 @@ private:
 	public:
 		LogFileOutput(char* filename);
 		~LogFileOutput();
-		void update(LPTSTR newString);
+		void update(LPTSTR);
 	};
 // Construction
 public:
@@ -66,7 +68,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	static DWORD WINAPI serverThrd(void *);
+	static DWORD WINAPI runServer(void *);
 
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedStatusbar();
@@ -87,4 +89,8 @@ private:
 	CButton* guiLogChk;
 	CButton* logFileChk; 
 	CEdit* guiLog;
+
+	HWND* handle;
+	HANDLE serverThread;
+	HANDLE shutdownEvent;
 };

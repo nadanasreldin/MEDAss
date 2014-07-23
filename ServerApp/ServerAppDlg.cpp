@@ -40,12 +40,27 @@ BEGIN_MESSAGE_MAP(CServerAppDlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATE_GUILOG, &CServerAppDlg::OnUpdateGuiLog)
 END_MESSAGE_MAP()
 
-DWORD WINAPI CServerAppDlg::serverThrd(LPVOID pParam) {
-	HWND* handle = (HWND*)pParam;
-	Server server(DEFAULT_PORT, handle);
+struct ServerArgs{
+	HWND* windowHandle;
+	HANDLE* shutdownEvent;
+};
+
+DWORD WINAPI CServerAppDlg::runServer(LPVOID pParam) {
+	// get server args
+	struct ServerArgs* serverArgs = (ServerArgs*)pParam;
+	HWND* windowHandle = serverArgs->windowHandle;
+	HANDLE* shutdownEvent = serverArgs->shutdownEvent;
+
+	// create new server object
+	Server server(DEFAULT_PORT, windowHandle, shutdownEvent);
+
+	delete serverArgs;
+	
+	// start the server
 	if (server.init() == 0) {
-		server.start_comm();
+		server.startComm();
 	}
+
 	return 0;
 }
 
@@ -68,13 +83,16 @@ BOOL CServerAppDlg::OnInitDialog()
 	statusBar.SetPaneInfo(0, ID_INDICATOR_MSG, SBPS_NORMAL, rect.Width());
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, ID_INDICATOR_MSG);
 
+	// three checkboxes
 	statusBarChk = (CButton *)GetDlgItem(IDC_CHECK_STATUSBAR);
 	guiLogChk = (CButton *)GetDlgItem(IDC_CHECK_GUILOG);
 	logFileChk = (CButton *)GetDlgItem(IDC_CHECK_LOGFILE);
+
+	// gui log output
 	guiLog = (CEdit*)GetDlgItem(IDC_LOG);
 
 	// get window object handle
-	HWND *handle = new HWND;
+	handle = new HWND;
 	*handle = GetSafeHwnd();
 
 	// initialize the 3 output destinations
@@ -82,9 +100,17 @@ BOOL CServerAppDlg::OnInitDialog()
 	guiLogOutput = new GuiLogOutput(handle);
 	logFileOutput = new LogFileOutput("output.log");
 
-	// start server logic in another thread
+	// create an event that will be needed for graceful server shutdown
+	shutdownEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	
+	// args needed to instantiate server object
+	struct ServerArgs* serverArgs = new ServerArgs;
+	serverArgs->shutdownEvent = &shutdownEvent;
+	serverArgs->windowHandle = handle;
+
+	// launch server in new thread
 	DWORD serverThrdId;
-	HANDLE serverHandle = CreateThread(NULL, 0, serverThrd, handle, 0, &serverThrdId);
+	serverThread = CreateThread(NULL, 0, runServer, serverArgs, 0, &serverThrdId);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -127,6 +153,21 @@ HCURSOR CServerAppDlg::OnQueryDragIcon()
 
 void CServerAppDlg::OnBnClickedCancel()
 {
+	// fire shutdown event to alert server that it should shutdown 
+	if (WaitForSingleObject(serverThread, 0) != WAIT_OBJECT_0) {
+		SetEvent(this->shutdownEvent);
+		if (WaitForSingleObject(serverThread, 3) != WAIT_OBJECT_0) {
+			TerminateThread(serverThread, 1);
+		}
+	}
+	CloseHandle(this->shutdownEvent);
+	CloseHandle(this->serverThread);
+	
+	delete handle;
+	delete statusBarOutput;
+	delete guiLogOutput;
+	delete logFileOutput;
+
 	CDialogEx::OnCancel();
 }
 
@@ -169,6 +210,8 @@ LRESULT CServerAppDlg::OnNewMessage(WPARAM wParam, LPARAM lParam) {
 	guiLogOutput->update(msg);
 	logFileOutput->update(msg);
 
+	delete msg;
+
 	return 0;
 }
 
@@ -192,14 +235,6 @@ LRESULT CServerAppDlg::OnUpdateGuiLog(WPARAM wParam, LPARAM lParam) {
 	guiLog->LineScroll(guiLog->GetLineCount());
 
 	return 0;
-}
-
-CServerAppDlg::StatusBarOutput::StatusBarOutput(HWND* handle) {
-	this->handle = handle;
-}
-
-CServerAppDlg::GuiLogOutput::GuiLogOutput(HWND* handle) {
-	this->handle = handle;
 }
 
 CServerAppDlg::LogFileOutput::LogFileOutput(char* filename) {

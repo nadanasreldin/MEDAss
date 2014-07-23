@@ -116,5 +116,7 @@ int main(int argc, char **argv)
 		client.startComm();
 	}
 
+	system("pause");
+
 	return 0;
 }
