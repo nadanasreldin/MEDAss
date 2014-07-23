@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientApp", "ClientApp\ClientApp.vcxproj", "{F1B28CF2-F8CB-491E-BE43-885105E1D56A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerApp", "ServerApp\ServerApp.vcxproj", "{E6DCD251-194F-4782-BF89-ED17287CB76C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1B28CF2-F8CB-491E-BE43-885105E1D56A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F1B28CF2-F8CB-491E-BE43-885105E1D56A}.Debug|Win32.Build.0 = Debug|Win32
+		{F1B28CF2-F8CB-491E-BE43-885105E1D56A}.Release|Win32.ActiveCfg = Release|Win32
+		{F1B28CF2-F8CB-491E-BE43-885105E1D56A}.Release|Win32.Build.0 = Release|Win32
+		{E6DCD251-194F-4782-BF89-ED17287CB76C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6DCD251-194F-4782-BF89-ED17287CB76C}.Debug|Win32.Build.0 = Debug|Win32
+		{E6DCD251-194F-4782-BF89-ED17287CB76C}.Release|Win32.ActiveCfg = Release|Win32
+		{E6DCD251-194F-4782-BF89-ED17287CB76C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
