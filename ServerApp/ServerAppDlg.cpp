@@ -40,11 +40,15 @@ BEGIN_MESSAGE_MAP(CServerAppDlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATE_GUILOG, &CServerAppDlg::OnUpdateGuiLog)
 END_MESSAGE_MAP()
 
+// the struct used to pass multiple parameters 
+// to thread that will run server logic
 struct ServerArgs{
 	HWND* windowHandle;
 	HANDLE* shutdownEvent;
 };
 
+// entry point of thread that starts the server 
+// initializes server using args passed in a ServerArgs struct
 DWORD WINAPI CServerAppDlg::runServer(LPVOID pParam) {
 	// get server args
 	struct ServerArgs* serverArgs = (ServerArgs*)pParam;
@@ -153,7 +157,7 @@ HCURSOR CServerAppDlg::OnQueryDragIcon()
 
 void CServerAppDlg::OnBnClickedCancel()
 {
-	// fire shutdown event to alert server that it should shutdown 
+	// if server thread is still running, fire shutdown event
 	if (WaitForSingleObject(serverThread, 0) != WAIT_OBJECT_0) {
 		SetEvent(this->shutdownEvent);
 		if (WaitForSingleObject(serverThread, 3) != WAIT_OBJECT_0) {
@@ -171,6 +175,7 @@ void CServerAppDlg::OnBnClickedCancel()
 	CDialogEx::OnCancel();
 }
 
+// launched when status bar checkbox is toggled
 void CServerAppDlg::OnBnClickedStatusbar()
 {
 	if (statusBarChk->GetCheck()) {
@@ -181,7 +186,7 @@ void CServerAppDlg::OnBnClickedStatusbar()
 	}
 }
 
-
+// launched when gui log checkbox is toggled
 void CServerAppDlg::OnBnClickedGuilog()
 {
 	if (guiLogChk->GetCheck()) {
@@ -192,6 +197,7 @@ void CServerAppDlg::OnBnClickedGuilog()
 	}
 }
 
+// launched when log file checkbox is toggled
 void CServerAppDlg::OnBnClickedLogfile()
 {
 	if (logFileChk->GetCheck()) {
@@ -202,6 +208,8 @@ void CServerAppDlg::OnBnClickedLogfile()
 	}
 }
 
+// launched when a WM_NEW_MSG is sent from the server thread
+// uses parameter passed in message to update the gui accordingly
 LRESULT CServerAppDlg::OnNewMessage(WPARAM wParam, LPARAM lParam) {
 	LPTSTR msg = (LPTSTR)lParam;
 
@@ -215,6 +223,8 @@ LRESULT CServerAppDlg::OnNewMessage(WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
+// launched when a WM_UPDATE_STATUSBAR msg is sent from the StatusBarOutput object
+// changes status bar to show the string sent as a message parameter
 LRESULT CServerAppDlg::OnUpdateStatusBar(WPARAM wParam, LPARAM lParam) {
 	LPTSTR msg = reinterpret_cast<LPTSTR>(lParam);
 	statusBar.SetPaneText(0, msg);
@@ -222,6 +232,8 @@ LRESULT CServerAppDlg::OnUpdateStatusBar(WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
+// launched when a WM_UPDATE_GUILOG msg is sent from the GuiLogOutput object
+// appends the string sent as a message parameter to the log of the gui window
 LRESULT CServerAppDlg::OnUpdateGuiLog(WPARAM wParam, LPARAM lParam) {
 	// get msg and add new line
 	LPTSTR msg = reinterpret_cast<LPTSTR>(lParam);
@@ -237,14 +249,8 @@ LRESULT CServerAppDlg::OnUpdateGuiLog(WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-CServerAppDlg::LogFileOutput::LogFileOutput(char* filename) {
-	this->file.open(filename);
-}
-
-CServerAppDlg::LogFileOutput::~LogFileOutput() {
-	this->file.close();
-}
-
+// sends message to ui to update status bar with the input string
+// only if status bar output is enabled
 void CServerAppDlg::StatusBarOutput::update(LPTSTR newMsg) {
 	if (isEnabled()) {
 		// send WM_UPDATE_STATUSBAR to update status bar with msg
@@ -252,13 +258,17 @@ void CServerAppDlg::StatusBarOutput::update(LPTSTR newMsg) {
 	}
 }
 
+// sends message to ui to update gui log with the input string
+// only if gui log output is enabled
 void CServerAppDlg::GuiLogOutput::update(LPTSTR newMsg) {
 	if (isEnabled()) {
-		// send WM_UPDATE_GUILOG to update guilog with msg
+		// send WM_UPDATE_GUILOG to update gui log with msg
 		::SendMessage(*this->handle, WM_UPDATE_GUILOG, 0, (LPARAM)newMsg);
 	}
 }
 
+// appends the input string to the log file
+// only if log file output is enabled
 void CServerAppDlg::LogFileOutput::update(LPTSTR newMsg) {
 	if (isEnabled()) {
 		// get current time

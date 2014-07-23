@@ -23,7 +23,7 @@ private:
 	char* hostname;
 	SOCKET connectSocket;
 public:
-	Client(char*);
+	Client(char* hostname) : hostname(hostname) {}
 	~Client();
 	int init();
 	void startComm();

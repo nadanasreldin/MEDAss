@@ -2,12 +2,24 @@
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms737591(v=vs.85).aspx
 
 #include "Client.h"
-#include <string>
 
-Client::Client(char* hostname) {
-	this->hostname = hostname;
+Client::~Client() {
+	int iResult;
+	// shutdown the connection since no more data will be sent
+	iResult = shutdown(connectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+		closesocket(connectSocket);
+		WSACleanup();
+		return;
+	}
+
+	// cleanup
+	closesocket(connectSocket);
+	WSACleanup();
 }
 
+// initializes connection with server
 int Client::init() {
 	WSADATA wsaData;
 	this->connectSocket = INVALID_SOCKET;
@@ -69,6 +81,8 @@ int Client::init() {
 	return 0;
 }
 
+// starts communication with server by sending user inputs
+// exits when user types in TERMINATE command
 void Client::startComm() {
 	char sendbuf[DEFAULT_BUFLEN];
 	int iResult;
@@ -85,22 +99,6 @@ void Client::startComm() {
 			return;
 		}
 	} while (true);
-}
-
-Client::~Client() {
-	int iResult;
-	// shutdown the connection since no more data will be sent
-	iResult = shutdown(connectSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(connectSocket);
-		WSACleanup();
-		return;
-	}
-
-	// cleanup
-	closesocket(connectSocket);
-	WSACleanup();
 }
 
 int main(int argc, char **argv)

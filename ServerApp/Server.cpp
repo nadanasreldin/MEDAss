@@ -20,6 +20,8 @@ Server::~Server() {
 	WSACleanup();
 }
 
+// initializes server to listen on the correct port for connections
+// blocks until a client connects
 int Server::init() {
 
 	WSADATA wsaData;
@@ -96,6 +98,10 @@ int Server::init() {
 	return 0;
 }
 
+// Starts communication with the client by receiving what the client sends
+// and posting a WM_NEW_MSG msg containing the received string to the UI thread.
+// Exits when the client sends a TERMINATE msg or
+// the server's stopEvent is activated
 void Server::startComm() {
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
@@ -105,14 +111,13 @@ void Server::startComm() {
 		ZeroMemory(recvbuf, recvbuflen);
 		iResult = recv(clientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
-			//printf("%s", recvbuf);
-
 			// widen string to pass in message
 			size_t size = strlen(recvbuf) + 1;
 			wchar_t *tempbuf = new wchar_t[size];
 			size_t convertedChars = 0;
 			mbstowcs_s(&convertedChars, tempbuf, size, recvbuf, _TRUNCATE);
 
+			// send WM_NEW_MSG to the ui passing in the received string as a param
 			PostMessage(*this->windowHandle, WM_NEW_MSG, 0, (LPARAM)tempbuf);
 		}
 		else if (iResult == 0)
@@ -124,7 +129,7 @@ void Server::startComm() {
 			return;
 		}
 
-	} while (iResult > 0 
-		&& WaitForSingleObject(this->shutdownEvent, 0) != WAIT_OBJECT_0);
+	} while (iResult > 0 // client has not shut down
+		&& WaitForSingleObject(this->shutdownEvent, 0) != WAIT_OBJECT_0); // ui thread has not requested shutdown
 }
 
